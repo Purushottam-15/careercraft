@@ -961,6 +961,18 @@ app.put("/api/auth/profile", auth, async (req, res) => {
   }
 });
 
+// Delete user profile
+app.delete("/api/auth/profile", auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    await db.query("DELETE FROM users WHERE id = ?", [userId]);
+    res.json({ message: "Profile deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting profile:", error);
+    res.status(500).json({ message: "Failed to delete profile" });
+  }
+});
+
 // Post a new job (for employers)
 app.post("/api/jobs", auth, requireRole(["employer"]), async (req, res) => {
   try {

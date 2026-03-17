@@ -46,6 +46,9 @@ function setupEventListeners() {
   document
     .getElementById("resumeGeneratorForm")
     .addEventListener("submit", handleGenerateResume);
+  document
+    .getElementById("editProfileForm")
+    .addEventListener("submit", handleEditProfile);
     
   document
     .getElementById("resumeGeneratorForm")
@@ -104,6 +107,14 @@ async function loadHomeContent() {
 
     // Insert into homeSection
     document.getElementById("homeSection").innerHTML = bodyContent;
+
+    // Hide Employer button if user is already logged in
+    if (currentUser) {
+      const empBtn = document.getElementById("employerHeroBtn");
+      if (empBtn) {
+        empBtn.style.display = 'none';
+      }
+    }
   } catch (error) {
     console.error("Error loading home content:", error);
   }
@@ -131,6 +142,61 @@ function showHome() {
 
   loadHomeContent();
 }
+
+async function loadEmployerHomeContent() {
+  try {
+    const response = await fetch("home/employer-home.html?t=" + new Date().getTime());
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const bodyContent = doc.body.innerHTML;
+    document.getElementById("employerHomeSection").innerHTML = bodyContent;
+    
+    // Auto-hide the "Sign in" button if user is already logged in as employer
+    if (currentUser) {
+      const employerSignIn = document.getElementById("employerHomeSignInBtn");
+      if (employerSignIn) employerSignIn.style.display = 'none';
+    }
+  } catch (error) {
+    console.error("Error loading employer home content:", error);
+  }
+}
+
+function showEmployerHome() {
+  hideAllSections();
+  const section = document.getElementById("employerHomeSection");
+  const container = document.querySelector(".container");
+  
+  if (section) section.classList.remove("hidden");
+  if (container) container.classList.add("home-active");
+  
+  loadEmployerHomeContent();
+}
+
+async function loadHelpContent() {
+  try {
+    const response = await fetch("help/help.html?t=" + new Date().getTime());
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const bodyContent = doc.body.innerHTML;
+    document.getElementById("helpSection").innerHTML = bodyContent;
+  } catch (error) {
+    console.error("Error loading help content:", error);
+  }
+}
+
+function showHelpCenter() {
+  hideAllSections();
+  const section = document.getElementById("helpSection");
+  const container = document.querySelector(".container");
+  
+  if (section) section.classList.remove("hidden");
+  if (container) container.classList.add("home-active");
+  
+  loadHelpContent();
+}
+
 async function handleApplyJob(e) {
   e.preventDefault();
   const formData = new FormData(e.target);
@@ -177,14 +243,8 @@ function checkAuthStatus() {
         if (currentUser.role === "admin") {
           window.location.href = "Institute/institute.html";
           return true;
-        } else if (currentUser.role === "employer") {
-          loadEmployerJobs();
-          loadEmployerStats();
-          showHome(); // Default to home instead of dashboard
         } else {
-          loadAvailableJobs();
-          loadStudentStats();
-          showHome(); // Default to home instead of dashboard
+          showDashboard(); 
         }
         return true;
       } else {
@@ -377,19 +437,30 @@ function profileDropdown(event) {
 function showProfile() {
   hideAllSections();
   document.getElementById("profileSection").classList.remove("hidden");
+  
+  // Ensure we are in View Mode initially
+  document.getElementById("profileViewMode").classList.remove("hidden");
+  document.getElementById("profileEditMode").classList.add("hidden");
+  
   loadProfile();
+  
   // Close dropdown
   const dropdown = document.getElementById("profileDropdown");
   if (dropdown) dropdown.classList.add("hidden");
 }
 
-function showEditProfile() {
-  hideAllSections();
-  document.getElementById("editProfileSection").classList.remove("hidden");
-  loadEditProfile();
-  // Close dropdown
-  const dropdown = document.getElementById("profileDropdown");
-  if (dropdown) dropdown.classList.add("hidden");
+function toggleProfileEditMode() {
+  const viewMode = document.getElementById("profileViewMode");
+  const editMode = document.getElementById("profileEditMode");
+  
+  if (viewMode.classList.contains("hidden")) {
+    viewMode.classList.remove("hidden");
+    editMode.classList.add("hidden");
+  } else {
+    viewMode.classList.add("hidden");
+    editMode.classList.remove("hidden");
+    loadEditProfile(); // Load current data into the fields
+  }
 }
 
 function showDashboard() {
@@ -408,11 +479,7 @@ function showDashboard() {
 }
 
 function hideProfileSection() {
-  showHome();
-}
-
-function hideEditProfileSection() {
-  showProfile();
+  showDashboard();
 }
 
 function hideStatsSection() {
@@ -420,9 +487,25 @@ function hideStatsSection() {
 }
 
 // Authentication handlers
+function setButtonLoading(button, isLoading, originalText = 'Submit', loadingText = 'Processing...') {
+  if (!button) return;
+  if (isLoading) {
+    button.disabled = true;
+    button.innerHTML = `<span class="btn-loader"></span> ${loadingText}`;
+    button.dataset.originalText = originalText;
+  } else {
+    button.disabled = false;
+    button.innerHTML = button.dataset.originalText || originalText;
+  }
+}
+
 async function handleLogin(e) {
   e.preventDefault();
-  const formData = new FormData(e.target);
+  const form = e.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  setButtonLoading(submitBtn, true, 'Login', 'Logging in...');
+
+  const formData = new FormData(form);
   const loginData = {
     email: formData.get("email"),
     password: formData.get("password"),
@@ -446,16 +529,8 @@ async function handleLogin(e) {
       if (currentUser.role === "admin") {
         // Redirect to institute admin panel
         window.location.href = "Institute/institute.html";
-      } else if (currentUser.role === "employer") {
-        updateNavigation();
-        loadEmployerJobs();
-        loadEmployerStats();
-        showHome();
       } else {
-        updateNavigation();
-        loadAvailableJobs();
-        loadStudentStats();
-        showHome();
+        showDashboard();
       }
     } else {
       alert(result.message || "Login failed");
@@ -463,15 +538,22 @@ async function handleLogin(e) {
   } catch (error) {
     console.error("Login error:", error);
     alert("Login failed. Please try again.");
+  } finally {
+    setButtonLoading(submitBtn, false, 'Login');
   }
 }
 
 async function handleEmployerRegister(e) {
   e.preventDefault();
-  const formData = new FormData(e.target);
+  const form = e.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  setButtonLoading(submitBtn, true, 'Register', 'Registering...');
+
+  const formData = new FormData(form);
   
   if (formData.get('password') !== formData.get('confirmPassword')) {
     alert('Passwords do not match');
+    setButtonLoading(submitBtn, false, 'Register');
     return;
   }
   
@@ -503,15 +585,22 @@ async function handleEmployerRegister(e) {
   } catch (error) {
     console.error('Registration error:', error);
     alert('Registration failed. Please try again.');
+  } finally {
+    setButtonLoading(submitBtn, false, 'Register');
   }
 }
 
 async function handleStudentRegister(e) {
   e.preventDefault();
-  const formData = new FormData(e.target);
+  const form = e.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  setButtonLoading(submitBtn, true, 'Register', 'Registering...');
+
+  const formData = new FormData(form);
   
   if (formData.get('password') !== formData.get('confirmPassword')) {
     alert('Passwords do not match');
+    setButtonLoading(submitBtn, false, 'Register');
     return;
   }
   
@@ -547,6 +636,8 @@ async function handleStudentRegister(e) {
   } catch (error) {
     console.error('Registration error:', error);
     alert('Registration failed. Please try again.');
+  } finally {
+    setButtonLoading(submitBtn, false, 'Register');
   }
 }
 
@@ -1065,6 +1156,72 @@ function loadEditProfile() {
     if (form.course) form.course.value = currentUser.course || "";
     if (form.graduationYear)
       form.graduationYear.value = currentUser.graduationYear || "";
+  }
+}
+
+async function handleEditProfile(e) {
+  e.preventDefault();
+  const form = e.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  setButtonLoading(submitBtn, true, 'Save Changes', 'Saving...');
+
+  const formData = new FormData(form);
+  const updatedData = Object.fromEntries(formData.entries());
+
+  try {
+    const response = await fetch(`${API_BASE}/auth/profile`, {
+      method: 'PUT',
+      headers: { 
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify(updatedData)
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      alert('Profile updated successfully!');
+      
+      // Update local storage
+      Object.assign(currentUser, updatedData);
+      localStorage.setItem('user', JSON.stringify(currentUser));
+      updateNavigation();
+      
+      toggleProfileEditMode(); // Go back to view mode
+      loadProfile(); // Refresh details UI
+    } else {
+      alert(result.message || 'Failed to update profile');
+    }
+  } catch (error) {
+    console.error('Profile update error:', error);
+    alert('Failed to update profile. Please try again.');
+  } finally {
+    setButtonLoading(submitBtn, false, 'Save Changes');
+  }
+}
+
+async function deleteProfile() {
+  if (!confirm("Are you sure you want to permanently delete your account? This action cannot be undone.")) {
+    return;
+  }
+  
+  try {
+    const response = await fetch(`${API_BASE}/auth/profile`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    });
+    
+    if (response.ok) {
+      alert("Your account has been permanently deleted.");
+      logout();
+    } else {
+      const result = await response.json();
+      alert(result.message || "Failed to delete account");
+    }
+  } catch (err) {
+    console.error("Delete profile error:", err);
+    alert("Connection error. Could not delete account.");
   }
 }
 
