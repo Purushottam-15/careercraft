@@ -29,9 +29,10 @@ body {
 }
 
 .nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0 6rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -664,17 +665,16 @@ body {
     background: white;
     color: #666;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 8px;
     font-weight: 500;
     transition: all 0.3s ease;
 }
 
-.dash-btn:hover,
+/* .dash-btn:hover,
 .dash-btn.active {
-    background: #007bff;
+    background: #2b3036;
     color: white;
-    border-color: #007bff;
-}
+} */
 
 .stats-cards {
     display: grid;
@@ -1056,6 +1056,7 @@ body {
 .btn-primary:hover {
     background: #0056b3;
 }
+
 /* Button Loader Styles */
 .btn-loader {
     display: inline-block;
@@ -1070,7 +1071,9 @@ body {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .submit-btn:disabled,
@@ -1177,9 +1180,7 @@ body {
     color: white;
 }
 
-/* ========================================================= */
-/* ENHANCED DASHBOARD CARDS & STRUCTURE */
-/* ========================================================= */
+
 .dashboard-section {
     padding: 2rem;
     max-width: 1200px;
@@ -1199,20 +1200,20 @@ body {
     border: none;
     font-size: 1.1rem;
     font-weight: 600;
-    color: #64748b;
+    color: #2e3136;
     padding: 10px 5px;
     cursor: pointer;
     position: relative;
     transition: color 0.3s;
 }
 
-.dash-btn:hover {
+/* .dash-btn:hover {
     color: #0f172a;
-}
+} */
 
-.dash-btn.active {
+/* .dash-btn.active {
     color: #2563eb;
-}
+} */
 
 .dash-btn.active::after {
     content: '';
@@ -1221,7 +1222,6 @@ body {
     left: 0;
     width: 100%;
     height: 3px;
-    background-color: #2563eb;
+    background-color: #244fad;
     border-radius: 3px 3px 0 0;
 }
-

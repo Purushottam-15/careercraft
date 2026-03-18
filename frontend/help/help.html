@@ -1,80 +1,50 @@
-<style>
-  .help-container {
-    padding: 60px 40px;
-    max-width: 1000px;
-    margin: 0 auto;
-    background-color: #ffffff;
-  }
-  .help-title {
-    font-size: 2.2rem;
-    font-weight: 500;
-    color: #4b5563;
-    margin-bottom: 40px;
-  }
-  .help-cards {
-    display: flex;
-    gap: 20px;
-  }
-  .help-card {
-    flex: 1;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 30px;
-    transition: box-shadow 0.2s;
-  }
-  .help-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  }
-  .help-card h3 {
-    font-size: 1.5rem;
-    color: #1f2937;
-    margin-bottom: 15px;
-    font-weight: 500;
-  }
-  .help-card p {
-    color: #4b5563;
-    font-size: 1rem;
-    line-height: 1.6;
-    margin-bottom: 30px;
-  }
-  .help-card a {
-    color: #2563eb;
-    font-weight: 600;
-    text-decoration: none;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .help-card a:hover {
-    text-decoration: underline;
-  }
-</style>
-
-<div class="help-container">
-  <h1 class="help-title">If you are looking for help, you are in the right place</h1>
+<div class="help-center-wrapper">
   
-  <div class="help-cards">
-    <div class="help-card">
-      <h3>Help for jobseekers</h3>
-      <p>Got a question or need help using CareerCraft? Our Jobseeker Help Center is the place to start. Whether it is about setting up an account, using a product or service, or facing a problem head-on, browse our FAQs or read our how-to articles. Your problem is our priority, no matter how simple or complex.</p>
-      <a href="javascript:void(0)">
-        Jobseeker Help Center 
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <div class="help-header-section">
+    <span class="help-pre-title">CAREERCRAFT RESOURCES</span>
+    <h1 class="help-title">How can we help you today?</h1>
+    <p class="help-subtitle">Select the option that best describes who you are, and we'll route you to the exact resources and tools you need to succeed.</p>
+  </div>
+
+  <div class="help-cards-layout">
+    
+    <!-- Student / Jobseeker Card -->
+    <div class="premium-help-card">
+      <div class="card-icon-container student-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+          <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+        </svg>
+      </div>
+      <h3>Help for Jobseekers</h3>
+      <p>Got a question or need help using CareerCraft? Our Jobseeker Help Center is the place to start. Whether finding companies, accessing AI tools, formatting your resume, or hunting for remote roles, your problem is our priority.</p>
+      
+      <a href="javascript:void(0)" class="help-action-link student-link" onclick="if(window.showHome) window.showHome()">
+        Visit Jobseeker Center
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M5 12h14M12 5l7 7-7 7"/>
         </svg>
       </a>
     </div>
 
-    <div class="help-card">
-      <h3>Help for employers</h3>
-      <p>Looking to hire? The Employer Help Center is for companies and recruiters with professional CareerCraft accounts and includes technical support and guides for using CareerCraft's suite of tools for finding, interviewing and hiring candidates.</p>
-      <a href="javascript:void(0)" onclick="if(window.showEmployerHome) window.showEmployerHome()">
-        Employer Help Center 
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <!-- Employer / Recruiter Card -->
+    <div class="premium-help-card">
+      <div class="card-icon-container employer-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+      </div>
+      <h3>Help for Employers</h3>
+      <p>Looking to hire or manage candidates? The Employer Help Center is designed for companies and recruiters. It includes technical guides on posting job templates, interviewing mechanics, filtering talent, and company dashboards.</p>
+      
+      <a href="javascript:void(0)" class="help-action-link employer-link" onclick="if(window.showEmployerHome) window.showEmployerHome()">
+        Visit Employer Center
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M5 12h14M12 5l7 7-7 7"/>
         </svg>
       </a>
     </div>
+
   </div>
 </div>

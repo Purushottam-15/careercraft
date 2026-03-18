@@ -8,13 +8,18 @@
   <link rel="stylesheet" href="styles.css?v=3" />
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="stylesheet" href="home/home-style.css?v=3" />
+  <link rel="stylesheet" href="home/employer-home.css?v=1" />
   <link rel="stylesheet" href="footer/footer.css?v=3">
+  <link rel="stylesheet" href="help/help-style.css?v=1" />
+  <link rel="stylesheet" href="quiz/quiz.css?v=1" />
+  <link rel="stylesheet" href="resume/resume.css?v=1" />
+  <link rel="stylesheet" href="about/about.css?v=1" />
 </head>
 
 <body>
   <nav class="navbar">
     <div class="nav-container">
-      <img class="logo" src="ref.png" alt="carreercraft" onclick="window.location.href='index.html'"
+      <img class="logo" src="ref.png" alt="carreercraft" onclick="handleLogoClick(event)"
         style="cursor: pointer;" />
       <div class="nav-links">
         <div class="anc">
@@ -61,7 +66,7 @@
               </div>
               <div class="dropdown-col">
                 <h4>Learning & Events</h4>
-                <a href="#quizzes">Quizzes</a>
+                <a href="javascript:void(0)" onclick="if(window.showQuiz) window.showQuiz()">Quizzes</a>
                 <a href="#contests">Contests</a>
                 <a href="#hackathons">Hackathon Updates</a>
               </div>
@@ -81,7 +86,6 @@
               <a href="javascript:void(0)" onclick="showEmployerRegister()">Recruiter</a>
             </div>
           </div>
-          <a href="javascript:void(0)" onclick="showEmployerHome()" style="color: #64748b; font-weight: 500; font-size: 0.95rem; text-decoration: none;">Employers / Post Job</a>
         </div>
 
         <div id="userNavLinks" class="hidden" style="display: flex; align-items: center; gap: 1rem;">
@@ -111,6 +115,15 @@
     </div>
     <div id="helpSection" class="form-section hidden">
       <!-- Help center will be loaded here -->
+    </div>
+    <div id="quizSection" class="form-section hidden">
+      <!-- Quiz will be loaded here -->
+    </div>
+    <div id="resumeSection" class="form-section hidden">
+      <!-- Resume will be loaded here -->
+    </div>
+    <div id="aboutSection" class="form-section hidden">
+      <!-- About will be loaded here -->
     </div>
     <div id="loginForm" class="form-section">
       <div class="login-box">
@@ -348,88 +361,7 @@
         </div>
       </div>
 
-      <div id="resumeGeneratorSection" class="content-section hidden">
-        <h3>AI Resume Generator</h3>
-        <p style="margin-bottom: 1rem; color: #555;">Fill in your details below and our AI will format a professional
-          resume for you.</p>
-        <form id="resumeGeneratorForm" class="form">
-          <div class="form-group">
-            <label for="resFullName">Full Name *</label>
-            <input type="text" id="resFullName" name="fullName" required />
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="resEmail">Email *</label>
-              <input type="email" id="resEmail" name="email" required />
-            </div>
-            <div class="form-group">
-              <label for="resPhone">Phone *</label>
-              <input type="tel" id="resPhone" name="phone" required />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="resLocation">Location</label>
-              <input type="text" id="resLocation" name="location" placeholder="City, State" />
-            </div>
-            <div class="form-group">
-              <label for="resLinkedin">LinkedIn/Website URL</label>
-              <input type="text" id="resLinkedin" name="linkedin" placeholder="linkedin.com/in/username" />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="resObjective">Professional Summary</label>
-            <textarea id="resObjective" name="objective" rows="2"
-              placeholder="Briefly describe your career goals and profile."></textarea>
-          </div>
-
-          <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Education *</h4>
-          <div class="form-row">
-            <div class="form-group"><label>Degree</label><input type="text" name="eduDegree"
-                placeholder="e.g. B.Tech Computer Science" required /></div>
-            <div class="form-group"><label>Institution</label><input type="text" name="eduInstitution"
-                placeholder="e.g. XYZ University" required /></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>Year</label><input type="text" name="eduYear" placeholder="e.g. 2020 - 2024"
-                required /></div>
-            <div class="form-group"><label>CGPA / Percentage</label><input type="text" name="eduGrade"
-                placeholder="e.g. 8.5 CGPA" /></div>
-          </div>
-
-          <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Experience / Project</h4>
-          <div class="form-row">
-            <div class="form-group"><label>Role / Title</label><input type="text" name="expRole"
-                placeholder="e.g. Frontend Developer" /></div>
-            <div class="form-group"><label>Company / Context</label><input type="text" name="expCompany"
-                placeholder="e.g. TechCorp" /></div>
-            <div class="form-group"><label>Dates</label><input type="text" name="expDates"
-                placeholder="e.g. June 2023 - Present" /></div>
-          </div>
-          <div class="form-group">
-            <label>Key achievements</label>
-            <textarea name="expDesc" rows="2" placeholder="Describe your work and achievements..."></textarea>
-          </div>
-
-          <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Skills *</h4>
-          <div class="form-group">
-            <label for="resSkills">Technical Skills</label>
-            <input type="text" id="resSkills" name="skills" placeholder="e.g. JavaScript, Python, SQL" required />
-          </div>
-          <div style="display: flex; gap: 15px; align-items: center; margin-top: 1rem;">
-            <button type="submit" class="btn btn-primary" id="generateResumeBtn">Generate Resume with AI</button>
-            <a id="downloadResumeBtn" class="btn btn-primary" href="#"
-              style="background: #10b981; border-color: #0a8023; color: white; text-decoration: none; font-weight: bold; display: none;">
-              Download</a>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <div id="profileSection" class="form-section hidden">
+      <div id="profileSection" class="form-section hidden">
       <div class="form-container profile-container">
         
         <!-- View Mode -->
@@ -552,6 +484,8 @@
   </div>
   <div id="footerContainer"></div>
   <script src="script.js?v=2"></script>
+  <script src="quiz/quiz.js?v=2"></script>
+  <script src="resume/resume.js?v=1"></script>
 
 </body>
 

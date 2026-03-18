@@ -44,22 +44,8 @@ function setupEventListeners() {
     .getElementById("applyJobForm")
     .addEventListener("submit", handleApplyJob);
   document
-    .getElementById("resumeGeneratorForm")
-    .addEventListener("submit", handleGenerateResume);
-  document
     .getElementById("editProfileForm")
     .addEventListener("submit", handleEditProfile);
-    
-  document
-    .getElementById("resumeGeneratorForm")
-    .addEventListener("input", function() {
-      const genBtn = document.getElementById("generateResumeBtn");
-      const downBtn = document.getElementById("downloadResumeBtn");
-      if(genBtn && downBtn) {
-          genBtn.style.display = "inline-block";
-          downBtn.style.display = "none";
-      }
-    });
 
   // Handle clicks outside dropdowns to close them
   document.addEventListener("click", function (e) {
@@ -132,6 +118,15 @@ function togglePasswordVisibility(inputId) {
   }
 }
 
+function handleLogoClick(event) {
+  if (event) event.preventDefault();
+  if (currentUser && currentUser.role === "employer") {
+    showEmployerHome();
+  } else {
+    showHome();
+  }
+}
+
 function showHome() {
   hideAllSections();
   const homeSection = document.getElementById("homeSection");
@@ -195,6 +190,57 @@ function showHelpCenter() {
   if (container) container.classList.add("home-active");
   
   loadHelpContent();
+}
+
+async function loadQuizContent() {
+  try {
+    const response = await fetch("quiz/quiz.html?t=" + new Date().getTime());
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const bodyContent = doc.body.innerHTML;
+    document.getElementById("quizSection").innerHTML = bodyContent;
+  } catch (error) {
+    console.error("Error loading quiz content:", error);
+  }
+}
+
+function showQuiz() {
+  hideAllSections();
+  const section = document.getElementById("quizSection");
+  const container = document.querySelector(".container");
+  
+  if (section) section.classList.remove("hidden");
+  if (container) container.classList.add("home-active");
+  
+  // Load UI dynamically and then initialize its internal script App
+  loadQuizContent().then(() => {
+    if (window.quizApp) window.quizApp.init();
+  });
+}
+
+async function loadAboutContent() {
+  try {
+    const response = await fetch("about/about.html?t=" + new Date().getTime());
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const bodyContent = doc.body.innerHTML;
+    document.getElementById("aboutSection").innerHTML = bodyContent;
+  } catch (error) {
+    console.error("Error loading about content:", error);
+  }
+}
+
+function showAbout() {
+  hideAllSections();
+  const section = document.getElementById("aboutSection");
+  const container = document.querySelector(".container");
+  
+  if (section) section.classList.remove("hidden");
+  if (container) container.classList.add("home-active");
+  
+  loadAboutContent();
 }
 
 async function handleApplyJob(e) {
@@ -291,18 +337,36 @@ function updateNavigation() {
   }
 }
 // Navigation functions
+// Resume Routers
+async function loadResumeContent() {
+  try {
+    const response = await fetch("resume/resume.html?t=" + new Date().getTime());
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const bodyContent = doc.body.innerHTML;
+    document.getElementById("resumeSection").innerHTML = bodyContent;
+  } catch (error) {
+    console.error("Error loading resume content:", error);
+  }
+}
+
+function showResume() {
+  hideAllSections();
+  const section = document.getElementById("resumeSection");
+  const container = document.querySelector(".container");
+  
+  if (section) section.classList.remove("hidden");
+  if (container) container.classList.add("home-active");
+  
+  loadResumeContent().then(() => {
+    if (window.resumeFeatureApp) window.resumeFeatureApp.init();
+  });
+}
+
 function handleResumeGenerationNav(e) {
   if (e) e.preventDefault();
-  if (currentUser) {
-    if (currentUser.role === 'student') {
-      showStudentDashboard();
-      showResumeGenerator(null);
-    } else {
-      alert("Resume Generation is for student accounts only.");
-    }
-  } else {
-    showLogin();
-  }
+  showResume();
 }
 
 function showLogin() {
@@ -355,6 +419,10 @@ function hideAllSections() {
   if (container) {
     container.classList.remove("home-active");
   }
+
+  // Hide quiz specific overlays if any
+  const quizModal = document.getElementById("quiz-limit-modal");
+  if (quizModal) quizModal.classList.add("hidden");
 }
 
 function showPostJob(event) {
@@ -386,17 +454,10 @@ function showMyApplications(event) {
   setActiveTab(event);
   document.getElementById("browseJobsSection").classList.add("hidden");
   document.getElementById("myApplicationsSection").classList.remove("hidden");
-  document.getElementById("resumeGeneratorSection").classList.add("hidden");
   loadMyApplications();
 }
 
-function showResumeGenerator(event) {
-  console.log("Showing resume generator section");
-  setActiveTab(event);
-  document.getElementById("browseJobsSection").classList.add("hidden");
-  document.getElementById("myApplicationsSection").classList.add("hidden");
-  document.getElementById("resumeGeneratorSection").classList.remove("hidden");
-}
+
 
 function setActiveTab(event) {
   console.log("Setting active tab, event:", event);
@@ -1358,65 +1419,7 @@ window.onclick = function (event) {
   }
 };
 
-async function handleGenerateResume(e) {
-  e.preventDefault();
-  
-  const generateBtn = document.getElementById("generateResumeBtn");
-  const originalText = generateBtn.textContent;
-  generateBtn.textContent = "Generating Document with AI...";
-  generateBtn.disabled = true;
 
-  const formData = new FormData(e.target);
-  const data = Object.fromEntries(formData.entries());
-
-  try {
-    const response = await fetch(`${API_BASE}/resume/generate`, {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem("token")}`
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (response.ok) {
-      // The backend now sends a raw .docx buffer
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      
-      const downloadBtn = document.getElementById("downloadResumeBtn");
-      downloadBtn.href = url;
-      downloadBtn.download = `${data.fullName.replace(/\s+/g, '_')}_Resume.docx`;
-      
-      const generateBtn = document.getElementById("generateResumeBtn");
-      generateBtn.style.display = "none";
-      downloadBtn.style.display = "inline-block";
-      
-      // We don't revoke the URL here so the user can click it as many times as they want without breaking.
-    } else {
-      const result = await response.json().catch(() => ({}));
-      alert(result.message || "Failed to generate resume");
-    }
-  } catch (error) {
-    console.error("Resume generation error:", error);
-    alert("Connection failed. Please try again later.");
-  } finally {
-    generateBtn.textContent = originalText;
-    generateBtn.disabled = false;
-  }
-}
-
-function printResume() {
-    const printContent = document.getElementById("resumeOutputArea").innerHTML;
-    const originalContent = document.body.innerHTML;
-
-    document.body.innerHTML = printContent;
-    window.print();
-    document.body.innerHTML = originalContent;
-    
-    // Quick re-init for SPA functionality
-    location.reload();
-}
 // Load footer dynamically
 function loadFooter() {
   fetch("footer/footer.html?v=" + new Date().getTime()) // Updated path
