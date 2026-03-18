@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CareerCraft</title>
   <link rel="stylesheet" href="styles.css?v=3" />
-  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
   <link rel="stylesheet" href="home/home-style.css?v=3" />
   <link rel="stylesheet" href="home/employer-home.css?v=1" />
   <link rel="stylesheet" href="footer/footer.css?v=3">
@@ -19,25 +19,25 @@
 <body>
   <nav class="navbar">
     <div class="nav-container">
-      <img class="logo" src="ref.png" alt="carreercraft" onclick="handleLogoClick(event)"
+      <img class="logo" src="assets/logo.png" alt="carreercraft" onclick="handleLogoClick(event)"
         style="cursor: pointer;" />
       <div class="nav-links">
         <div class="anc">
 
           <div class="hover-menu-container">
-            <a href="job.html" class="nav-hover-link">Jobs</a>
+            <a href="#" class="nav-hover-link">Jobs</a>
             <div class="hover-dropdown">
               <div class="dropdown-col">
                 <h4>Popular Categories</h4>
-                <a href="job.html">IT jobs</a>
-                <a href="job.html">Sales jobs</a>
-                <a href="job.html">Marketing jobs</a>
+                <a href="#">IT jobs</a>
+                <a href="#">Sales jobs</a>
+                <a href="#">Marketing jobs</a>
               </div>
               <div class="dropdown-col">
                 <h4>Jobs by location</h4>
-                <a href="job.html">Jobs in Delhi</a>
-                <a href="job.html">Jobs in Mumbai</a>
-                <a href="job.html">Jobs in Bangalore</a>
+                <a href="#">Jobs in Delhi</a>
+                <a href="#">Jobs in Mumbai</a>
+                <a href="#">Jobs in Bangalore</a>
               </div>
             </div>
           </div>
@@ -56,7 +56,7 @@
           </div>
 
           <div class="hover-menu-container">
-            <a href="#services" class="nav-hover-link">Services</a>
+            <a href="#" class="nav-hover-link">Services</a>
             <div class="hover-dropdown">
               <div class="dropdown-col">
                 <h4>Resume Tools</h4>
@@ -67,8 +67,8 @@
               <div class="dropdown-col">
                 <h4>Learning & Events</h4>
                 <a href="javascript:void(0)" onclick="if(window.showQuiz) window.showQuiz()">Quizzes</a>
-                <a href="#contests">Contests</a>
-                <a href="#hackathons">Hackathon Updates</a>
+                <a href="#">Contests</a>
+                <a href="#">Hackathon Updates</a>
               </div>
             </div>
           </div>
@@ -88,7 +88,7 @@
           </div>
         </div>
 
-        <div id="userNavLinks" class="hidden" style="display: flex; align-items: center; gap: 1rem;">
+        <div id="userNavLinks" class="hidden">
           <span id="welcomeMessage" class="welcome-text"></span>
           <div class="profile-menu">
             <button class="profile-btn">
@@ -125,7 +125,7 @@
     <div id="aboutSection" class="form-section hidden">
       <!-- About will be loaded here -->
     </div>
-    <div id="loginForm" class="form-section">
+    <div id="loginForm" class="form-section hidden">
       <div class="login-box">
         <h2 class="login-title">Login</h2>
 
@@ -325,9 +325,7 @@
           <button class="dash-btn" onclick="showMyApplications(event)">
             My Applications
           </button>
-          <button class="dash-btn" onclick="showResumeGenerator(event)">
-            Resume Generator
-          </button>
+          
         </div>
       </div>
 
@@ -360,8 +358,9 @@
           <div id="applicationsList" class="table-body"></div>
         </div>
       </div>
+    </div> <!-- Close studentDashboard -->
 
-      <div id="profileSection" class="form-section hidden">
+    <div id="profileSection" class="form-section hidden">
       <div class="form-container profile-container">
         
         <!-- View Mode -->
@@ -376,7 +375,7 @@
           <div id="profileDetails" class="profile-details-grid"></div>
           
           <div class="profile-actions-bottom">
-            <button class="cancel-btn" onclick="hideProfileSection()">Back to Dashboard</button>
+            <button class="cancel-btn" onclick="showDashboard()">Back to Dashboard</button>
             <button class="danger-btn delete-profile-btn" onclick="deleteProfile()">Delete Account</button>
           </div>
         </div>
@@ -445,7 +444,6 @@
         </div>
 
       </div>
-    </div>
 
     <div id="statsSection" class="form-section hidden">
       <div class="form-container stats-container">

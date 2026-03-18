@@ -21,6 +21,16 @@ const API_BASE = (() => {
 
 console.log("API Base URL:", API_BASE);
 
+// XSS Sanitization Helper
+function escapeHTML(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 document.addEventListener("DOMContentLoaded", function () {
   checkAuthStatus();
   setupEventListeners();
@@ -83,7 +93,7 @@ function setupEventListeners() {
 
 async function loadHomeContent() {
   try {
-    const response = await fetch("home/home.html?t=" + new Date().getTime());
+    const response = await fetch("home/home.html");
     const html = await response.text();
 
     // Extract just the body content
@@ -140,7 +150,7 @@ function showHome() {
 
 async function loadEmployerHomeContent() {
   try {
-    const response = await fetch("home/employer-home.html?t=" + new Date().getTime());
+    const response = await fetch("home/employer-home.html");
     const html = await response.text();
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
@@ -170,7 +180,7 @@ function showEmployerHome() {
 
 async function loadHelpContent() {
   try {
-    const response = await fetch("help/help.html?t=" + new Date().getTime());
+    const response = await fetch("help/help.html");
     const html = await response.text();
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
@@ -194,7 +204,7 @@ function showHelpCenter() {
 
 async function loadQuizContent() {
   try {
-    const response = await fetch("quiz/quiz.html?t=" + new Date().getTime());
+    const response = await fetch("quiz/quiz.html");
     const html = await response.text();
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
@@ -221,7 +231,7 @@ function showQuiz() {
 
 async function loadAboutContent() {
   try {
-    const response = await fetch("about/about.html?t=" + new Date().getTime());
+    const response = await fetch("about/about.html");
     const html = await response.text();
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
@@ -246,6 +256,13 @@ function showAbout() {
 async function handleApplyJob(e) {
   e.preventDefault();
   const formData = new FormData(e.target);
+
+  // Client-side file size validation (limit to 5MB)
+  const resumeFile = formData.get("resume");
+  if (resumeFile && resumeFile.size > 5 * 1024 * 1024) {
+    alert("Resume file size must be less than 5MB.");
+    return;
+  }
 
   try {
     const response = await fetch(`${API_BASE}/applications`, {
@@ -340,7 +357,7 @@ function updateNavigation() {
 // Resume Routers
 async function loadResumeContent() {
   try {
-    const response = await fetch("resume/resume.html?t=" + new Date().getTime());
+    const response = await fetch("resume/resume.html");
     const html = await response.text();
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
@@ -445,7 +462,8 @@ function showBrowseJobs(event) {
   setActiveTab(event);
   document.getElementById("browseJobsSection").classList.remove("hidden");
   document.getElementById("myApplicationsSection").classList.add("hidden");
-  document.getElementById("resumeGeneratorSection").classList.add("hidden");
+  const resumeSec = document.getElementById("resumeGeneratorSection");
+  if (resumeSec) resumeSec.classList.add("hidden");
   loadAvailableJobs();
 }
 
@@ -457,6 +475,9 @@ function showMyApplications(event) {
   loadMyApplications();
 }
 
+function showResumeGenerator(event) {
+  showResume();
+}
 
 
 function setActiveTab(event) {
@@ -896,24 +917,35 @@ async function loadAvailableJobs() {
       jobRow.className = "job-row";
       const companyName =
         job.companyName || `${job.employerFirstName} ${job.employerLastName}`;
-      
+
       let actionButton = '';
       if (job.hasApplied) {
         actionButton = `<button class="apply-btn" disabled style="background-color: #6c757d; cursor: not-allowed;">Applied</button>`;
       } else {
-        actionButton = `<button class="apply-btn" onclick="openApplyModal(${job.id}, '${job.title}', '${companyName}')">Apply</button>`;
+        actionButton = `<div id="apply-btn-container-${job.id}"></div>`;
       }
 
       jobRow.innerHTML = `
-                <div>${job.title}</div>
-                <div>${companyName}</div>
-                <div>${job.skills.join(", ")}</div>
+                <div>${escapeHTML(job.title)}</div>
+                <div>${escapeHTML(companyName)}</div>
+                <div>${escapeHTML(job.skills.join(", "))}</div>
                 <div>${job.experienceYears}y ${job.experienceMonths}m</div>
                 <div>
                     ${actionButton}
                 </div>
             `;
       jobsList.appendChild(jobRow);
+
+      if (!job.hasApplied) {
+        const btnContainer = document.getElementById(`apply-btn-container-${job.id}`);
+        if (btnContainer) {
+          const btn = document.createElement("button");
+          btn.className = "apply-btn";
+          btn.textContent = "Apply";
+          btn.onclick = () => openApplyModal(job.id, job.title, companyName);
+          btnContainer.replaceWith(btn);
+        }
+      }
     });
 
     console.log("Available jobs loaded successfully");
@@ -937,14 +969,14 @@ async function loadMyApplications() {
       const appRow = document.createElement("div");
       appRow.className = "job-row";
       appRow.innerHTML = `
-                <div>${app.jobTitle}</div>
-                <div>${
+                <div>${escapeHTML(app.jobTitle)}</div>
+                <div>${escapeHTML(
                   app.companyName ||
                   app.employerFirstName + " " + app.employerLastName
-                }</div>
-                <div>${new Date(app.appliedDate).toLocaleDateString()}</div>
+                )}</div>
+                <div>${escapeHTML(new Date(app.appliedDate).toLocaleDateString())}</div>
                 <div>
-                    <span class="status-${app.status.toLowerCase()}">${app.status.toUpperCase()}</span>
+                    <span class="status-${escapeHTML(app.status.toLowerCase())}">${escapeHTML(app.status.toUpperCase())}</span>
                 </div>
             `;
       applicationsList.appendChild(appRow);
@@ -1060,23 +1092,19 @@ async function viewApplications(jobId) {
       .map(
         (app) => `
             <div style="border: 1px solid #ddd; padding: 1rem; margin: 0.5rem 0; border-radius: 5px;">
-                <strong>${app.studentFirstName} ${
-          app.studentLastName
-        }</strong><br>
-                Email: ${app.studentEmail}<br>
-                ${app.college ? `College: ${app.college}<br>` : ""}
-                ${app.course ? `Course: ${app.course}<br>` : ""}
-                ${app.phone ? `Phone: ${app.phone}<br>` : ""}
-                Applied: ${new Date(app.appliedDate).toLocaleDateString()}<br>
-                Status: <span class="status-${
-                  app.status
-                }">${app.status.toUpperCase()}</span><br>
+                <strong>${escapeHTML(app.studentFirstName)} ${escapeHTML(app.studentLastName)}</strong><br>
+                Email: ${escapeHTML(app.studentEmail)}<br>
+                ${app.college ? `College: ${escapeHTML(app.college)}<br>` : ""}
+                ${app.course ? `Course: ${escapeHTML(app.course)}<br>` : ""}
+                ${app.phone ? `Phone: ${escapeHTML(app.phone)}<br>` : ""}
+                Applied: ${escapeHTML(new Date(app.appliedDate).toLocaleDateString())}<br>
+                Status: <span class="status-${escapeHTML(app.status)}">${escapeHTML(app.status).toUpperCase()}</span><br>
                 ${
                   app.resumePath
-                    ? `<a href="${app.resumePath}" target="_blank">View Resume</a><br>`
+                    ? `<a href="${escapeHTML(app.resumePath)}" target="_blank">View Resume</a><br>`
                     : ""
                 }
-                ${app.coverLetter ? `Cover Letter: ${app.coverLetter}<br>` : ""}
+                ${app.coverLetter ? `Cover Letter: ${escapeHTML(app.coverLetter)}<br>` : ""}
                 <div style="margin-top: 0.5rem;">
                     <button onclick="updateApplicationStatus(${
                       app.id
@@ -1407,7 +1435,7 @@ function logout() {
   if (dropdown) dropdown.classList.add("hidden");
 }
 
-window.onclick = function (event) {
+window.addEventListener("click", function (event) {
   const applyModal = document.getElementById("applyModal");
   const viewModal = document.getElementById("viewApplicationsModal");
 
@@ -1417,12 +1445,12 @@ window.onclick = function (event) {
   if (event.target === viewModal) {
     closeApplicationsModal();
   }
-};
+});
 
 
 // Load footer dynamically
 function loadFooter() {
-  fetch("footer/footer.html?v=" + new Date().getTime()) // Updated path
+  fetch("footer/footer.html") // Updated path
     .then((response) => {
       if (!response.ok) {
         throw new Error("Footer file not found");

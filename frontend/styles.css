@@ -193,6 +193,7 @@ body {
 
 .hover-dropdown a:hover {
     color: #2563eb;
+    text-decoration: none;
 }
 
 .nav-links button {
@@ -443,6 +444,28 @@ body {
     margin-top: 0.5rem;
     font-weight: 500;
     transition: color 0.2s;
+}
+
+nav a {
+  text-decoration: none;
+  color: var(--text-color);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+#userNavLinks {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+#userNavLinks.hidden {
+  display: none !important;
+}
+
+nav a:hover,
+nav a.active {
+    color: #0f172a;
 }
 
 .forgot-link:hover {
@@ -1168,7 +1191,8 @@ body {
     background: transparent;
     border: 1px solid #ef4444;
     color: #ef4444;
-    padding: 10px 16px;
+    padding: 0.38rem;
+    margin-left: 21px;
     border-radius: 6px;
     cursor: pointer;
     font-weight: 600;

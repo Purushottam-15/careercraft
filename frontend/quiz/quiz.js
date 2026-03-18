@@ -91,7 +91,7 @@ window.quizApp = {
                 document.getElementById("limit-message").textContent = "Please log in to continue.";
                 document.getElementById("limit-login-btn").style.display = "inline-block";
             } else {
-                document.getElementById("limit-message").textContent = "You have reached your quiz limit. (Resets automatically over time).";
+                document.getElementById("limit-message").textContent = "You have reached your quiz limit. (Resets automatically after 4 hrs.)";
                 document.getElementById("limit-login-btn").style.display = "none";
             }
 
