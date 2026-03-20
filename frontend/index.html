@@ -14,6 +14,10 @@
   <link rel="stylesheet" href="quiz/quiz.css?v=1" />
   <link rel="stylesheet" href="resume/resume.css?v=1" />
   <link rel="stylesheet" href="about/about.css?v=1" />
+  <link rel="stylesheet" href="contact/contact.css?v=1" />
+  <link rel="stylesheet" href="roadmaps/roadmaps.css?v=1" />
+  <link rel="stylesheet" href="hackathons/hackathons.css?v=1" />
+  <link rel="stylesheet" href="internships/internships.css?v=1" />
 </head>
 
 <body>
@@ -75,11 +79,11 @@
         </div>
 
         <div id="guestNavLinks" class="btn" style="display: flex; gap: 1rem; align-items: center;">
-          <button class="nav-btn login" onclick="showLogin()">Login</button>
+          <button class="nav-btn login" onclick="showLogin()">Sign In</button>
 
           <div class="register-menu">
             <button class="nav-btn register" onclick="toggleRegisterDropdown(event)">
-              Register
+              Get Started
             </button>
             <div id="registerDropdown" class="register-dropdown hidden">
               <a href="javascript:void(0)" onclick="showStudentRegister()">Student</a>
@@ -124,6 +128,18 @@
     </div>
     <div id="aboutSection" class="form-section hidden">
       <!-- About will be loaded here -->
+    </div>
+    <div id="contactSection" class="form-section hidden">
+      <!-- Contact page will be loaded here -->
+    </div>
+    <div id="roadmapSection" class="form-section hidden">
+      <!-- Roadmaps page will be loaded here -->
+    </div>
+    <div id="hackathonSection" class="form-section hidden">
+      <!-- Hackathons page will be loaded here -->
+    </div>
+    <div id="internshipsSection" class="form-section hidden">
+      <!-- Internships page will be loaded here -->
     </div>
     <div id="loginForm" class="form-section hidden">
       <div class="login-box">
@@ -422,12 +438,12 @@
             <div id="studentFields" class="hidden">
               <div class="form-row">
                 <div class="form-group">
-                  <label>College</label>
-                  <input type="text" name="college" />
-                </div>
-                <div class="form-group">
                   <label>Course</label>
                   <input type="text" name="course" />
+                </div>
+                <div class="form-group">
+                  <label>College</label>
+                  <input type="text" name="college" />
                 </div>
                 <div class="form-group">
                   <label>Graduation Year</label>
@@ -437,13 +453,14 @@
             </div>
 
             <div class="profile-actions-bottom">
-              <button type="submit" class="submit-btn">Save Changes</button>
               <button type="button" class="cancel-btn" onclick="toggleProfileEditMode()">Cancel</button>
+              <button type="submit" class="submit-btn">Save Changes</button>
             </div>
           </form>
         </div>
 
       </div>
+    </div>
 
     <div id="statsSection" class="form-section hidden">
       <div class="form-container stats-container">

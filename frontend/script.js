@@ -8,8 +8,6 @@ const API_BASE = (() => {
   const port = window.location.port;
   const protocol = window.location.protocol;
 
-  console.log("Current location:", { hostname, port, protocol });
-
   // Local development
   if (hostname === "localhost" || hostname === "127.0.0.1") {
     return `${protocol}//${hostname}:${port || 5000}/api`;
@@ -19,7 +17,6 @@ const API_BASE = (() => {
   return "/api";
 })();
 
-console.log("API Base URL:", API_BASE);
 
 // XSS Sanitization Helper
 function escapeHTML(str) {
@@ -253,6 +250,160 @@ function showAbout() {
   loadAboutContent();
 }
 
+async function loadContactContent() {
+  try {
+    const response = await fetch("contact/contact.html");
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const bodyContent = doc.body.innerHTML;
+    document.getElementById("contactSection").innerHTML = bodyContent;
+  } catch (error) {
+    console.error("Error loading contact content:", error);
+  }
+}
+
+window.showContact = function() {
+  hideAllSections();
+  const section = document.getElementById("contactSection");
+  const container = document.querySelector(".container");
+  
+  if (section) section.classList.remove("hidden");
+  if (container) container.classList.add("home-active");
+  
+  loadContactContent();
+};
+
+window.handleContactSubmit = async function(e) {
+  e.preventDefault();
+  const form = e.target;
+  const errorMsg = document.getElementById("contactErrorMsg");
+  const submitBtn = document.getElementById("contactSubmitBtn");
+  
+  const email = document.getElementById("contactEmail").value;
+  const phone = document.getElementById("contactPhone").value;
+  const feedback = document.getElementById("contactFeedback").value;
+
+  // Dynamic set of _next redirect to bounce user back naturally
+  document.getElementById("contactNextUrl").value = window.location.origin;
+
+  // Words validation
+  if (feedback) {
+    const words = feedback.trim().split(/\s+/);
+    if (words.length > 100) {
+      errorMsg.textContent = "Message cannot exceed 100 words.";
+      errorMsg.classList.remove("hidden");
+      return;
+    }
+  }
+
+  try {
+    submitBtn.textContent = "Validating...";
+    submitBtn.disabled = true;
+    errorMsg.classList.add("hidden");
+
+    const response = await fetch(`${API_BASE}/contact/validate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, phone, feedback })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to validate details");
+    }
+
+    // API approved the DB check! Submit the form natively to FormSubmit.co
+    submitBtn.textContent = "Sending...";
+    form.submit();
+
+  } catch (error) {
+    errorMsg.textContent = error.message;
+    errorMsg.classList.remove("hidden");
+    submitBtn.textContent = "Submit";
+    submitBtn.disabled = false;
+  }
+};
+
+// ======================= ROADMAP RENDERING ENGINE =======================
+async function loadRoadmapHubContent() {
+  try {
+    const response = await fetch("roadmaps/roadmaps.html");
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const bodyContent = doc.body.innerHTML;
+    document.getElementById("roadmapSection").innerHTML = bodyContent;
+  } catch (error) {
+    console.error("Error loading roadmaps:", error);
+  }
+}
+
+window.showRoadmap = function() {
+  hideAllSections();
+  const section = document.getElementById("roadmapSection");
+  const container = document.querySelector(".container");
+  
+  if (section) section.classList.remove("hidden");
+  if (container) container.classList.add("home-active");
+  
+  loadRoadmapHubContent();
+};
+
+
+// ======================= HACKATHONS ENGINE =======================
+async function loadHackathonsContent() {
+  try {
+    const response = await fetch("hackathons/hackathons.html");
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const bodyContent = doc.body.innerHTML;
+    document.getElementById("hackathonSection").innerHTML = bodyContent;
+  } catch (error) {
+    console.error("Error loading hackathons layout:", error);
+  }
+}
+
+window.showHackathons = function(e) {
+  if (e) e.preventDefault();
+  hideAllSections();
+  const section = document.getElementById("hackathonSection");
+  const container = document.querySelector(".container");
+  
+  if (section) section.classList.remove("hidden");
+  if (container) container.classList.add("home-active");
+  
+  loadHackathonsContent();
+};
+
+// ======================= INTERNSHIPS ENGINE =======================
+async function loadInternshipsContent() {
+  try {
+    const response = await fetch("internships/internships.html");
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const bodyContent = doc.body.innerHTML;
+    document.getElementById("internshipsSection").innerHTML = bodyContent;
+  } catch (error) {
+    console.error("Error loading internships layout:", error);
+  }
+}
+
+window.showInternships = function(e) {
+  if (e) e.preventDefault();
+  hideAllSections();
+  const section = document.getElementById("internshipsSection");
+  const container = document.querySelector(".container");
+  
+  if (section) section.classList.remove("hidden");
+  if (container) container.classList.add("home-active");
+  
+  loadInternshipsContent();
+};
+
 async function handleApplyJob(e) {
   e.preventDefault();
   const formData = new FormData(e.target);
@@ -287,18 +438,12 @@ async function handleApplyJob(e) {
 }
 
 function checkAuthStatus() {
-  console.log("Checking authentication status...");
-
   const user = localStorage.getItem("user");
   const token = localStorage.getItem("token");
-
-  console.log("User in storage:", !!user);
-  console.log("Token in storage:", !!token);
 
   if (user && token) {
     try {
       currentUser = JSON.parse(user);
-      console.log("Current user loaded:", currentUser);
 
       if (currentUser && currentUser.role && currentUser.firstName) {
         updateNavigation();
@@ -321,7 +466,6 @@ function checkAuthStatus() {
     }
   }
 
-  console.log("No valid session found, showing home");
   showHome();
   return false;
 }
@@ -443,14 +587,12 @@ function hideAllSections() {
 }
 
 function showPostJob(event) {
-  console.log("Showing post job section");
   setActiveTab(event);
   document.getElementById("postJobSection").classList.remove("hidden");
   document.getElementById("myJobsSection").classList.add("hidden");
 }
 
 function showMyJobs(event) {
-  console.log("Showing my jobs section");
   setActiveTab(event);
   document.getElementById("postJobSection").classList.add("hidden");
   document.getElementById("myJobsSection").classList.remove("hidden");
@@ -458,7 +600,6 @@ function showMyJobs(event) {
 }
 
 function showBrowseJobs(event) {
-  console.log("Showing browse jobs section");
   setActiveTab(event);
   document.getElementById("browseJobsSection").classList.remove("hidden");
   document.getElementById("myApplicationsSection").classList.add("hidden");
@@ -468,7 +609,6 @@ function showBrowseJobs(event) {
 }
 
 function showMyApplications(event) {
-  console.log("Showing my applications section");
   setActiveTab(event);
   document.getElementById("browseJobsSection").classList.add("hidden");
   document.getElementById("myApplicationsSection").classList.remove("hidden");
@@ -481,8 +621,6 @@ function showResumeGenerator(event) {
 
 
 function setActiveTab(event) {
-  console.log("Setting active tab, event:", event);
-
   // Remove active class from all buttons
   document.querySelectorAll(".dash-btn").forEach((btn) => {
     btn.classList.remove("active");
@@ -760,8 +898,6 @@ async function handlePostJob(e) {
     salary: formData.get("salary")?.trim() || null,
   };
 
-  console.log("Posting job with data:", jobData);
-
   try {
     const response = await fetch(`${API_BASE}/jobs`, {
       method: "POST",
@@ -773,7 +909,6 @@ async function handlePostJob(e) {
     });
 
     const result = await response.json();
-    console.log("Server response:", result);
 
     if (response.ok) {
       // Show success message
@@ -804,9 +939,7 @@ async function handlePostJob(e) {
 
 // Load jobs functions
 async function loadEmployerJobs() {
-  console.log("=== Loading Employer Jobs ===");
   const token = localStorage.getItem("token");
-  console.log("Token exists:", !!token);
 
   try {
     const response = await fetch(`${API_BASE}/jobs/employer`, {
@@ -816,8 +949,6 @@ async function loadEmployerJobs() {
       },
     });
 
-    console.log("Response status:", response.status);
-
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Error response:", errorText);
@@ -825,7 +956,6 @@ async function loadEmployerJobs() {
     }
 
     const jobs = await response.json();
-    console.log("Received jobs:", jobs);
 
     const jobsList = document.getElementById("employerJobsList");
     if (!jobsList) {
@@ -877,16 +1007,12 @@ async function loadEmployerJobs() {
 }
 
 async function loadAvailableJobs() {
-  console.log("=== Loading Available Jobs for Students ===");
   try {
     const token = localStorage.getItem("token");
-    console.log("Token exists:", !!token);
 
     const response = await fetch(`${API_BASE}/jobs`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-
-    console.log("Response status:", response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -895,7 +1021,6 @@ async function loadAvailableJobs() {
     }
 
     const jobs = await response.json();
-    console.log("Available jobs received:", jobs);
 
     const jobsList = document.getElementById("jobsList");
     if (!jobsList) {
@@ -912,7 +1037,6 @@ async function loadAvailableJobs() {
     }
 
     jobs.forEach((job) => {
-      console.log("Processing job for student:", job);
       const jobRow = document.createElement("div");
       jobRow.className = "job-row";
       const companyName =
@@ -948,7 +1072,6 @@ async function loadAvailableJobs() {
       }
     });
 
-    console.log("Available jobs loaded successfully");
   } catch (error) {
     console.error("Error loading available jobs:", error);
   }

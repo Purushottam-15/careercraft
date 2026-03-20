@@ -1083,6 +1083,45 @@ app.post("/api/resume/generate", optionalAuth, async (req, res) => {
   }
 });
 
+// ============ CONTACT ROUTE ============
+
+app.post("/api/contact/validate", async (req, res) => {
+  try {
+    const { email, phone, feedback } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required." });
+    }
+
+    // 1. Validate max message length (100 words)
+    if (feedback) {
+      const words = feedback.trim().split(/\s+/);
+      if (words.length > 100) {
+        return res.status(400).json({ message: "Message cannot exceed 100 words." });
+      }
+    }
+
+    // 2. Validate phone number regex
+    if (phone) {
+      const phoneRegex = /^(?:\+91|91)?[6-9]\d{9}$/;
+      if (!phoneRegex.test(phone)) {
+        return res.status(400).json({ message: "Invalid Phone Number" });
+      }
+    }
+
+    // 3. Database Check: Email must be registered in the users table
+    const [rows] = await db.query("SELECT id FROM users WHERE email = ?", [email]);
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Email must be registered with an account." });
+    }
+
+    res.status(200).json({ message: "Validation passed." });
+  } catch (error) {
+    console.error("Error validating contact form:", error);
+    res.status(500).json({ message: "An error occurred during validation." });
+  }
+});
+
 // ============ CATCH-ALL & ERROR HANDLER ============
 
 // Catch-all route for SPA (must be placed after all API routes)

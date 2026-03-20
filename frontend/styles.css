@@ -11,6 +11,8 @@ body {
     background-color: #f8fafc;
     color: #0f172a;
     line-height: 1.6;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .hidden {
@@ -40,8 +42,7 @@ body {
 
 .logo {
     cursor: pointer;
-    height: 4.5rem;
-    /* Increased size to fit the new logo dimensions better */
+    height: 3.8rem;
     padding-bottom: 3px;
 }
 
@@ -57,6 +58,7 @@ body {
 
 .container.home-active {
     max-width: 100%;
+    margin: 0;
     padding: 0;
 }
 
@@ -233,7 +235,7 @@ body {
 }
 
 .nav-btn.register {
-    background: #0f172a;
+    background: #1e3a8a;
     color: white;
     border: none;
     padding: 0.6rem 1.5rem;
@@ -630,7 +632,7 @@ nav a.active {
 .cancel-btn {
     width: 100%;
     padding: 0.8rem;
-    background: #6c757d;
+    background: #5f6265;
     color: white;
     border: none;
     border-radius: 5px;
@@ -1181,6 +1183,7 @@ nav a.active {
 .profile-actions-bottom {
     display: flex;
     justify-content: space-between;
+    column-gap: 2rem;
     align-items: center;
     margin-top: 30px;
     padding-top: 20px;
@@ -1248,4 +1251,46 @@ nav a.active {
     height: 3px;
     background-color: #244fad;
     border-radius: 3px 3px 0 0;
+}
+/* Mobile Navbar Responsiveness */
+@media (max-width: 900px) {
+    .nav-container {
+        padding: 0.5rem 1rem !important;
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+    .logo {
+        height: 2.5rem !important;
+    }
+    .nav-links {
+        width: 100% !important;
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+    .anc {
+        margin-right: 0 !important;
+        width: 100% !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 1rem !important;
+    }
+    #guestNavLinks, #userNavLinks {
+        width: 100% !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+    }
+    .hover-dropdown {
+        position: static !important;
+        display: none;
+        width: 100% !important;
+        margin-top: 0.5rem !important;
+        border: 1px solid rgba(0,0,0,0.05) !important;
+        box-shadow: none !important;
+        padding: 0.5rem !important;
+    }
+    .hover-menu-container:hover .hover-dropdown {
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+    }
 }
