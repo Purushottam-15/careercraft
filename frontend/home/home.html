@@ -60,7 +60,7 @@
                 </div>
             </div>
 
-            <div class="feature-card" onclick="handleResumeGenerationNav(event)" style="cursor: pointer;">
+            <div class="feature-card" onclick="if(window.handleResumeGenerationNav) window.handleResumeGenerationNav(event)" style="cursor: pointer;">
                 <div class="icon-box">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
@@ -74,7 +74,7 @@
                 </div>
             </div>
 
-            <div class="feature-card">
+            <div class="feature-card" onclick="if(window.showRoadmap) window.showRoadmap(event)" style="cursor: pointer;">
                 <div class="icon-box">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 6l6-3 6 3 6-3v12l-6 3-6-3-6 3V6z"></path>
@@ -82,7 +82,7 @@
                         <path d="M15 6v15"></path>
                     </svg>
                 </div>
-                <div class="feature-content" onclick="showRoadmap(event)" style="cursor: pointer;">
+                <div class="feature-content" id="roadmap">
                     <h3>Roadmap</h3>
                     <span class="arrow">></span>
                 </div>
@@ -104,7 +104,7 @@
                 </div>
             </div>
 
-            <div class="feature-card">
+            <div class="feature-card" onclick="if(window.showHackathons) window.showHackathons(event)" style="cursor: pointer;">
                 <div class="icon-box">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -113,20 +113,20 @@
                         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                     </svg>
                 </div>
-                <div class="feature-content" onclick="showHackathons(event)" style="cursor: pointer;">
+                <div class="feature-content" id="hackathons">
                     <h3>Contests & Hackathons</h3>
                     <span class="arrow">></span>
                 </div>
             </div>
 
-            <div class="feature-card">
+            <div class="feature-card" onclick="if(window.showInternships) window.showInternships(event)" style="cursor: pointer;">
                 <div class="icon-box">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                         <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                     </svg>
                 </div>
-                <div class="feature-content" onclick="showInternships(event)" style="cursor: pointer;">
+                <div class="feature-content" id="internships">
                     <h3>Find Internships</h3>
                     <span class="arrow">></span>
                 </div>

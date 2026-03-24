@@ -32,6 +32,13 @@ document.addEventListener("DOMContentLoaded", function () {
   checkAuthStatus();
   setupEventListeners();
   loadFooter();
+
+  // Basic Router for backward navigation
+  const hash = window.location.hash;
+  if(hash === '#quizzes' && typeof showQuiz === 'function') setTimeout(showQuiz, 100);
+  if((hash === '#hackathons' || hash === '#contests') && typeof showHackathons === 'function') setTimeout(showHackathons, 100);
+  if(hash === '#internships' && typeof showInternships === 'function') setTimeout(showInternships, 100);
+  if(hash === '#resume' && typeof handleResumeGenerationNav === 'function') setTimeout(() => document.getElementById("homeSection").classList.contains("hidden") || handleResumeGenerationNav(), 100);
 });
 
 function setupEventListeners() {
@@ -616,6 +623,9 @@ function hideAllSections() {
   if (container) {
     container.classList.remove("home-active");
   }
+  
+  // Important SPA fix: always snap back to top when switching main views!
+  window.scrollTo({ top: 0, behavior: "instant" });
 
   // Hide quiz specific overlays if any
   const quizModal = document.getElementById("quiz-limit-modal");

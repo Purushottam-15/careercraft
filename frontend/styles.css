@@ -6,13 +6,20 @@
     box-sizing: border-box;
 }
 
+html {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background-color: #f8fafc;
     color: #0f172a;
     line-height: 1.6;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
 }
 
 .hidden {
@@ -1332,9 +1339,20 @@ nav a.active {
         display: none;
         width: 100% !important;
         margin-top: 1rem !important;
-        box-shadow: none !important;
-        border: 1px solid rgba(0,0,0,0.05) !important;
-        padding: 1rem !important;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.02) !important;
+        border: 1px solid rgba(0,0,0,0.08) !important;
+        padding: 0.5rem 1rem !important;
+        background-color: #f8fafc !important;
+        border-radius: 12px !important;
+    }
+    .hover-dropdown a {
+        width: 100%;
+        text-align: center;
+        padding: 0.75rem !important;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .hover-dropdown a:last-child {
+        border-bottom: none;
     }
     .hover-menu-container:hover .hover-dropdown {
         display: flex !important;
