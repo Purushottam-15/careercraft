@@ -25,7 +25,12 @@
     <div class="nav-container">
       <img class="logo" src="assets/logo.png" alt="carreercraft" onclick="handleLogoClick(event)"
         style="cursor: pointer;" />
-      <div class="nav-links">
+      <button id="hamburger-btn" class="hamburger" aria-label="Toggle Menu">
+        <span class="ham-line"></span>
+        <span class="ham-line"></span>
+        <span class="ham-line"></span>
+      </button>
+      <div class="nav-links" id="nav-links">
         <div class="anc">
 
           <div class="hover-menu-container">
@@ -47,7 +52,7 @@
           </div>
 
           <div class="hover-menu-container">
-            <a href="companies/companies.html" class="nav-hover-link">Companies</a>
+            <a href="#" class="nav-hover-link">Companies</a>
             <div class="hover-dropdown">
               <div class="dropdown-col">
                 <h4>Explore Companies</h4>
@@ -496,6 +501,10 @@
         <div id="jobApplicationsList"></div>
       </div>
     </div>
+  </div>
+  <div id="mobile-sticky-cta" class="hidden">
+    <a href="#" class="mobile-cta-btn" onclick="showLogin()">Sign In</a>
+    <a href="companies/companies.html" class="mobile-cta-btn">Companies</a>
   </div>
   <div id="footerContainer"></div>
   <script src="script.js?v=2"></script>

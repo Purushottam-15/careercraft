@@ -486,7 +486,7 @@ app.post("/api/auth/login", async (req, res) => {
       const token = jwt.sign(
         { id: admin.id, username: admin.username, role: "admin" },
         process.env.JWT_SECRET || "fallback_secret_for_dev_only",
-        { expiresIn: "24h" },
+        { expiresIn: "8h" },
       );
 
       return res.json({
@@ -517,7 +517,7 @@ app.post("/api/auth/login", async (req, res) => {
     const token = jwt.sign(
       { id: user.id, role: user.role, email: user.email },
       process.env.JWT_SECRET || "fallback_secret_for_dev_only",
-      { expiresIn: "24h" },
+      { expiresIn: "8h" },
     );
 
     delete user.password;
@@ -1041,9 +1041,11 @@ app.post("/api/resume/generate", optionalAuth, async (req, res) => {
         return res.status(403).json({ message: "You have reached the limit of 5 resumes per 4 hours. Please try again later." });
       }
     } else {
+      const guestTimeLimit = new Date();
+      guestTimeLimit.setHours(guestTimeLimit.getHours() - 8);
       const [rows] = await db.query(
-        "SELECT COUNT(*) as count FROM resume_attempts WHERE session_id = ?",
-        [sessionId],
+        "SELECT COUNT(*) as count FROM resume_attempts WHERE session_id = ? AND created_at >= ?",
+        [sessionId, guestTimeLimit],
       );
       if (rows[0].count >= 1) {
         return res.status(403).json({ message: "Guests are limited to 1 resume. Please log in to continue." });

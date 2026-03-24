@@ -45,4 +45,6 @@ test*.docx
 # Database Dumps (keep schema in repo, ignore local dumps)
 careercraft-dump*.sql
 *-dump.sql
-*.sqlite
+*.sqlite
+example.html
+example.css

@@ -31,9 +31,12 @@ module.exports = function(getDb) {
             if (!sessionId) {
                 return { allowed: true, remaining: 1, isGuest: true };
             }
+            // Guest user limit reset after 8 hours
+            const guestTimeLimit = new Date();
+            guestTimeLimit.setHours(guestTimeLimit.getHours() - 8);
             const [rows] = await db.query(
-                "SELECT COUNT(*) as count FROM quiz_attempts WHERE session_id = ?", 
-                [sessionId]
+                "SELECT COUNT(*) as count FROM quiz_attempts WHERE session_id = ? AND created_at >= ?", 
+                [sessionId, guestTimeLimit]
             );
             return {
                 allowed: rows[0].count < 1,

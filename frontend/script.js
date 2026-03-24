@@ -35,6 +35,42 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function setupEventListeners() {
+  const hamburgerBtn = document.getElementById("hamburger-btn");
+  const navLinks = document.getElementById("nav-links");
+  if (hamburgerBtn && navLinks) {
+    hamburgerBtn.addEventListener("click", () => {
+      hamburgerBtn.classList.toggle("active");
+      navLinks.classList.toggle("active");
+    });
+    // Support exact touch toggling for sub-menus on mobile (replacing finicky hover)
+    document.querySelectorAll(".nav-hover-link").forEach(link => {
+       link.addEventListener("click", (e) => {
+         if (window.innerWidth <= 900) {
+             const dropdown = link.nextElementSibling;
+             if (dropdown && dropdown.classList.contains("hover-dropdown")) {
+                 e.preventDefault();
+                 const isCurrentlyOpen = dropdown.style.display === "flex";
+                 // Close all first
+                 document.querySelectorAll(".hover-dropdown").forEach(d => d.style.display = "");
+                 // Toggle target
+                 if (!isCurrentlyOpen) {
+                     dropdown.style.display = "flex";
+                     dropdown.style.flexDirection = "column";
+                 }
+             }
+         }
+       });
+    });
+
+    // Close mobile menu only when an actual destination link is clicked
+    document.querySelectorAll(".hover-dropdown a, .nav-btn").forEach(link => {
+       link.addEventListener("click", () => {
+         hamburgerBtn.classList.remove("active");
+         navLinks.classList.remove("active");
+       });
+    });
+  }
+
   document
     .getElementById("loginFormData")
     .addEventListener("submit", handleLogin);
