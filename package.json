@@ -8,10 +8,8 @@
     "start": "node backend/src/index.js",
     "dev": "node backend/src/index.js",
     "setup-db": "node backend/src/db/setup-database.js",
-    "install:frontend": "npm install --prefix frontend",
-    "build:frontend": "npm run build --prefix frontend",
-    "build": "npm run install:frontend && npm run build:frontend",
-    "postinstall": "npm run install:frontend && npm run build:frontend"
+    "build": "cd frontend && npm install && npm run build",
+    "postinstall": "cd frontend && npm install && npm run build"
   },
   "keywords": [
     "nodejs",
