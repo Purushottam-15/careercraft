@@ -37,9 +37,13 @@ export const register = async (req, res) => {
   try {
     const { firstName, username, email, password, role, companyName, college, course, graduationYear, phone, address } = req.body;
 
-    const [existingUsers] = await db.query("SELECT id FROM users WHERE email = ?", [email]);
+    const [existingUsers] = await db.query("SELECT id, isEmailVerified FROM users WHERE email = ?", [email]);
     if (existingUsers.length > 0) {
-      return res.status(400).json({ message: "User with this email already exists" });
+      if (existingUsers[0].isEmailVerified) {
+        return res.status(400).json({ message: "User with this email already exists" });
+      } else {
+        await db.query("DELETE FROM users WHERE id = ?", [existingUsers[0].id]);
+      }
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -273,7 +277,14 @@ export const updateProfile = async (req, res) => {
   try {
     const { firstName, lastName, phone, address, companyName, college, course, graduationYear } = req.body;
     const userId = req.user.id;
-    const role = req.user.role;
+
+    let role = req.user.role;
+    if (!role) {
+      const [userRows] = await db.query("SELECT role FROM users WHERE id = ?", [userId]);
+      if (userRows.length > 0) {
+        role = userRows[0].role;
+      }
+    }
 
     if (!firstName || !firstName.trim()) {
       return res.status(400).json({ message: "First name is required" });
@@ -281,20 +292,30 @@ export const updateProfile = async (req, res) => {
 
     await db.query(
       "UPDATE users SET firstName = ?, lastName = ?, phone = ?, address = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ?",
-      [firstName.trim(), lastName ? lastName.trim() : "", phone ? phone.trim() : null, address ? address.trim() : null, userId],
+      [
+        firstName.trim(),
+        lastName ? lastName.trim() : "",
+        phone ? phone.trim() : null,
+        address ? address.trim() : null,
+        userId,
+      ],
     );
 
     if (role === "employer") {
       await db.query(
-        "INSERT INTO employer_profiles (userId, companyName) VALUES (?, ?) ON DUPLICATE KEY UPDATE companyName = ?",
-        [userId, companyName ? companyName.trim() : null, companyName ? companyName.trim() : null],
+        `INSERT INTO employer_profiles (userId, companyName) 
+         VALUES (?, ?) 
+         ON DUPLICATE KEY UPDATE companyName = VALUES(companyName)`,
+        [userId, companyName ? companyName.trim() : ""],
       );
     } else if (role === "student") {
       const parsedGradYear = graduationYear ? parseInt(graduationYear, 10) : null;
       const validYear = isNaN(parsedGradYear) ? null : parsedGradYear;
       await db.query(
-        "INSERT INTO student_profiles (userId, college, course, graduationYear) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE college = ?, course = ?, graduationYear = ?",
-        [userId, college ? college.trim() : null, course ? course.trim() : null, validYear, college ? college.trim() : null, course ? course.trim() : null, validYear],
+        `INSERT INTO student_profiles (userId, college, course, graduationYear) 
+         VALUES (?, ?, ?, ?) 
+         ON DUPLICATE KEY UPDATE college = VALUES(college), course = VALUES(course), graduationYear = VALUES(graduationYear)`,
+        [userId, college ? college.trim() : "", course ? course.trim() : "", validYear],
       );
     }
 

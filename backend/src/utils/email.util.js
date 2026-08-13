@@ -16,9 +16,13 @@ export const sendEmail = async (to, subject, html) => {
     return;
   }
 
+  const fromEmail = process.env.EMAIL_FROM
+    ? (process.env.EMAIL_FROM.includes("<") ? process.env.EMAIL_FROM : `"CareerCraft" <${process.env.EMAIL_FROM}>`)
+    : '"CareerCraft" <support@codedeck.me>';
+
   try {
     const { data, error } = await resendClient.emails.send({
-      from: process.env.EMAIL_FROM,
+      from: fromEmail,
       to: [to],
       subject,
       html,
